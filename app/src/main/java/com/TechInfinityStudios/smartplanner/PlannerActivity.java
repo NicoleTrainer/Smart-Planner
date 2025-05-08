@@ -5,20 +5,19 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
+import android.view.Display;
+import android.graphics.Point;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,6 +39,7 @@ public class PlannerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_planner);
+
         dbHelper = new DatabaseHelper(this);
         eventList = new ArrayList<>();
         adapter = new PlannerAdapter(eventList, dbHelper);
@@ -51,41 +51,37 @@ public class PlannerActivity extends AppCompatActivity {
         studyTimerButton = findViewById(R.id.studyTimer);
         settingsButton = findViewById(R.id.settingsButton);
 
+        // Navigation Button Click Listeners
         homeButton.setOnClickListener(v -> {
             Intent intent = new Intent(PlannerActivity.this, MainActivity.class);
             startActivity(intent);
         });
 
-        plannerButton.setOnClickListener(v -> {
-
-        });
-
         toDoListButton.setOnClickListener(v -> {
-            // Handle to-do list button click
             Intent intent = new Intent(PlannerActivity.this, ToDoListActivity.class);
             startActivity(intent);
         });
 
         notesButton.setOnClickListener(v -> {
-            // Handle notes button click
             Intent intent = new Intent(PlannerActivity.this, NotesActivity.class);
             startActivity(intent);
         });
 
         studyTimerButton.setOnClickListener(v -> {
-            // Handle study timer button click
             Intent intent = new Intent(PlannerActivity.this, StudyTimerActivity.class);
             startActivity(intent);
         });
 
         settingsButton.setOnClickListener(v -> {
-            // Handle settings button click
             Intent intent = new Intent(PlannerActivity.this, SettingsActivity.class);
             startActivity(intent);
         });
 
-
+        // Calendar View Setup
         calendarView = findViewById(R.id.calendarView);
+
+
+        // RecyclerView Setup
         addButton = findViewById(R.id.addButton);
         recyclerView = findViewById(R.id.recyclerview);
         calendar = Calendar.getInstance();
@@ -95,22 +91,16 @@ public class PlannerActivity extends AppCompatActivity {
 
         showCalendarEvents();
 
-        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            @Override
-            public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
-                calendar.set(year, month, dayOfMonth);
-                showCalendarEvents();
-            }
+        calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
+            calendar.set(year, month, dayOfMonth);
+            showCalendarEvents();
         });
 
 
-        addButton.setOnClickListener(v -> {
-            addCalendarEvent();
-        });
 
+        // Add Button Click Listener
+        addButton.setOnClickListener(v -> addCalendarEvent());
     }
-
-
 
     private void addCalendarEvent() {
         Dialog dialog = new Dialog(this);
@@ -126,6 +116,7 @@ public class PlannerActivity extends AppCompatActivity {
         eventTime.setFocusable(false);
         eventTime.setClickable(true);
 
+        // Time Picker Dialog Setup
         eventTime.setOnClickListener(view -> {
             TimePickerDialog timePickerDialog = new TimePickerDialog(
                     PlannerActivity.this,
@@ -145,23 +136,27 @@ public class PlannerActivity extends AppCompatActivity {
             timePickerDialog.show();
         });
 
+        // Save Button Click Listener
         btnSave.setOnClickListener(v -> {
             String event = eventName.getText().toString();
             String timeOfEvent = eventTime.getText().toString();
             String date = formatDate(calendar.getTimeInMillis());
 
-            if (!event.isEmpty() && !timeOfEvent.isEmpty() && !date.isEmpty()) {
-                dbHelper.insertEvent(event, timeOfEvent, date);
-                eventList.add(new PlannerEvent(event, timeOfEvent, date));
-                adapter.notifyDataSetChanged();
+            // Validate Input Fields
+            if (event.isEmpty() || timeOfEvent.isEmpty()) {
+                Toast.makeText(PlannerActivity.this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            dbHelper.insertEvent(event, timeOfEvent, date);
+            eventList.add(new PlannerEvent(event, timeOfEvent, date));
+            adapter.notifyDataSetChanged();
             dialog.dismiss();
             showCalendarEvents();
         });
 
-        btnCancel.setOnClickListener(v -> {
-            dialog.dismiss();
-        });
+        // Cancel Button Click Listener
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
     }
 
     private void showCalendarEvents() {
@@ -175,8 +170,4 @@ public class PlannerActivity extends AppCompatActivity {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         return dateFormat.format(dateInMillis);
     }
-
-
-
-
 }

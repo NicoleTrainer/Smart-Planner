@@ -21,6 +21,9 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY AUTOINCREMENT, event TEXT, time TEXT, date TEXT)");
+        sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS notes(id INTEGER PRIMARY KEY AUTOINCREMENT, note TEXT)");
+        sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS toDoList(id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT)");
+        sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS timer(id INTEGER PRIMARY KEY AUTOINCREMENT, time TEXT)");
 
      }
 
