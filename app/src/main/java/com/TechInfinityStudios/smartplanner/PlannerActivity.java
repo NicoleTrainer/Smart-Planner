@@ -34,16 +34,56 @@ public class PlannerActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     private DatabaseHelper dbHelper;
     private List<PlannerEvent> eventList;
+    ImageButton homeButton, plannerButton, toDoListButton, notesButton, studyTimerButton, settingsButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_planner);
-        BottomNavigationView bottomNav = findViewById(R.id.btm_nav);
-        bottomNav.setItemIconTintList(null);  // Disable tinting
         dbHelper = new DatabaseHelper(this);
         eventList = new ArrayList<>();
         adapter = new PlannerAdapter(eventList, dbHelper);
+
+        homeButton = findViewById(R.id.homeButton);
+        plannerButton = findViewById(R.id.planner);
+        toDoListButton = findViewById(R.id.toDoList);
+        notesButton = findViewById(R.id.notes);
+        studyTimerButton = findViewById(R.id.studyTimer);
+        settingsButton = findViewById(R.id.settingsButton);
+
+        homeButton.setOnClickListener(v -> {
+            Intent intent = new Intent(PlannerActivity.this, MainActivity.class);
+            startActivity(intent);
+        });
+
+        plannerButton.setOnClickListener(v -> {
+
+        });
+
+        toDoListButton.setOnClickListener(v -> {
+            // Handle to-do list button click
+            Intent intent = new Intent(PlannerActivity.this, ToDoListActivity.class);
+            startActivity(intent);
+        });
+
+        notesButton.setOnClickListener(v -> {
+            // Handle notes button click
+            Intent intent = new Intent(PlannerActivity.this, NotesActivity.class);
+            startActivity(intent);
+        });
+
+        studyTimerButton.setOnClickListener(v -> {
+            // Handle study timer button click
+            Intent intent = new Intent(PlannerActivity.this, StudyTimerActivity.class);
+            startActivity(intent);
+        });
+
+        settingsButton.setOnClickListener(v -> {
+            // Handle settings button click
+            Intent intent = new Intent(PlannerActivity.this, SettingsActivity.class);
+            startActivity(intent);
+        });
+
 
         calendarView = findViewById(R.id.calendarView);
         addButton = findViewById(R.id.addButton);
@@ -68,26 +108,9 @@ public class PlannerActivity extends AppCompatActivity {
             addCalendarEvent();
         });
 
-        bottomNav.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-//                if (item.getItemId() == R.id.nav_todo) {
-//                    startActivity(new Intent(PlannerActivity.this, ToDoActivity.class));
-//                    return true;
-//                } else if (item.getItemId() == R.id.nav_planner) {
-//                    return true;
-//                } else if (item.getItemId() == R.id.nav_notes) {
-//                    startActivity(new Intent(PlannerActivity.this, NotesActivity.class));
-//                    return true;
-//                } else if (item.getItemId() == R.id.nav_reminder) {
-//                    startActivity(new Intent(PlannerActivity.this, RemindersActivity.class));
-//                    return true;
-//                }
-
-                return false;
-            }
-        });
     }
+
+
 
     private void addCalendarEvent() {
         Dialog dialog = new Dialog(this);

@@ -1,0 +1,8 @@
+<resources>
+    <!-- Custom style for CalendarView -->
+    <style name="CustomCalendarTextStyle" parent="Theme.AppCompat.Light">
+        <item name="android:textSize">20sp</item> <!-- Set the text size as per your need -->
+        <item name="android:textColor">@color/black</item> <!-- Set the text color as per your need -->
+        <item name="android:fontFamily">sans-serif-medium</item> <!-- Set the font family as per your need -->
+    </style>
+</resources>

@@ -21,6 +21,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".PlannerActivity"/>
+        <activity android:name=".ToDoListActivity"/>
+        <activity android:name=".NotesActivity"/>
+        <activity android:name=".StudyTimerActivity"/>
+        <activity android:name=".SettingsActivity"/>
+
     </application>
 
 </manifest>
