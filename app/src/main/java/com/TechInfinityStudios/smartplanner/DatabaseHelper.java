@@ -12,34 +12,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper{
-    private static final String name = "planner.db";
-    private static final int version = 1;
+    private static final String DATABASE_NAME = "planner.db";
+    private static final int DATABASE_VERSION = 1;
+    private static final String TABLE_EVENTS = "events";
     public DatabaseHelper(Context context) {
-        super(context, name, null, version);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY AUTOINCREMENT, event TEXT, time TEXT, date TEXT)");
-        sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS notes(id INTEGER PRIMARY KEY AUTOINCREMENT, note TEXT)");
-        sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS toDoList(id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT)");
-        sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS timer(id INTEGER PRIMARY KEY AUTOINCREMENT, time TEXT)");
+        sqLiteDatabase.execSQL("CREATE TABLE events(id INTEGER PRIMARY KEY AUTOINCREMENT, event TEXT, time TEXT, date TEXT)");
+        sqLiteDatabase.execSQL("CREATE TABLE notes(id INTEGER PRIMARY KEY AUTOINCREMENT, note TEXT)");
+        sqLiteDatabase.execSQL("CREATE TABlE toDoList(id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT)");
+        sqLiteDatabase.execSQL("CREATE TABLE timer(id INTEGER PRIMARY KEY AUTOINCREMENT, time TEXT)");
 
      }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS events ");
+        onCreate(sqLiteDatabase);
     }
 
     public void insertEvent(String title, String time, String date) {
         SQLiteDatabase db = this.getWritableDatabase();
+
         ContentValues values = new ContentValues();
+
         values.put("title", title);
         values.put("time", time);
         values.put("date", date);
-        long id = db.insert("events", null, values);
-        values.put("id", id);
+
+        db.insert("events", null, values);
         db.close();
     }
     public void deleteEvent(int id) {
