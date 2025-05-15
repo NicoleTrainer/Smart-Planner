@@ -97,19 +97,84 @@ public class PlannerActivity extends AppCompatActivity {
         });
 
 
-
         // Add Button Click Listener
         addButton.setOnClickListener(v -> addCalendarEvent());
+
+
+        adapter.setOnItemLongClickListener((event, position) -> {
+            Dialog dialog = new Dialog(PlannerActivity.this);
+            dialog.setContentView(R.layout.edit_event_dialog);
+
+            EditText editTitle = dialog.findViewById(R.id.eventName);
+            EditText editTime = dialog.findViewById(R.id.eventTime);
+            Button btnCancel = dialog.findViewById(R.id.btnCancel);
+            Button btnSave = dialog.findViewById(R.id.btnSave);
+            ImageButton btnDelete = dialog.findViewById(R.id.btnDelete);
+
+            // Populate fields with current event data
+            editTitle.setText(event.getTitle());
+            editTime.setText(event.getTime());
+
+            editTime.setClickable(true);
+
+
+            //Edit Time
+            editTime.setOnClickListener(view -> {
+                TimePickerDialog timePickerDialog = new TimePickerDialog(
+                        PlannerActivity.this,
+                        (view1, hourOfDay, minute) -> {
+                            String time;
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a");
+                            calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                            calendar.set(Calendar.MINUTE, minute);
+                            time = simpleDateFormat.format(calendar.getTime());
+                            editTime.setText(time);
+                        },
+                        calendar.get(Calendar.HOUR_OF_DAY),
+                        calendar.get(Calendar.MINUTE),
+                        false
+                );
+                timePickerDialog.setTitle("Select Time");
+                timePickerDialog.show();
+            });
+
+
+
+            // Cancel button
+            btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+            // Save button
+            btnSave.setOnClickListener(v -> {
+                String updatedTitle = editTitle.getText().toString();
+                String updatedTime = editTime.getText().toString();
+
+                dbHelper.updateEvent(event.getId(), updatedTitle, updatedTime, event.getDate());
+                eventList.set(position, new PlannerEvent(event.getId(), updatedTitle, updatedTime, event.getDate()));
+                adapter.notifyItemChanged(position);
+                dialog.dismiss();
+            });
+
+            // Delete button
+            btnDelete.setOnClickListener(v -> {
+                dbHelper.deleteEvent((int) event.getId());
+                eventList.remove(position);
+                adapter.notifyItemRemoved(position);
+                dialog.dismiss();
+            });
+
+            dialog.show();
+        });
     }
 
-    private void addCalendarEvent() {
+
+        private void addCalendarEvent() {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.add_event_dialog);
         dialog.getWindow().setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         dialog.show();
 
         EditText eventName = dialog.findViewById(R.id.eventName);
-        EditText eventTime = dialog.findViewById(R.id.EventTime);
+        EditText eventTime = dialog.findViewById(R.id.eventTime);
         Button btnCancel = dialog.findViewById(R.id.btnCancel);
         Button btnSave = dialog.findViewById(R.id.btnSave);
 
@@ -148,8 +213,8 @@ public class PlannerActivity extends AppCompatActivity {
                 return;
             }
 
-            dbHelper.insertEvent(event, timeOfEvent, date);
-            eventList.add(new PlannerEvent(event, timeOfEvent, date));
+            long id = dbHelper.insertEvent(event, timeOfEvent, date);
+            eventList.add(new PlannerEvent(id, event, timeOfEvent, date));
             adapter.notifyDataSetChanged();
             dialog.dismiss();
             showCalendarEvents();

@@ -1,11 +1,14 @@
 package com.TechInfinityStudios.smartplanner;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -74,8 +77,8 @@ public class NotesActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        addNote = findViewById(R.id.addButton);
-        recyclerView = findViewById(R.id.recyclerview);
+        addNote = findViewById(R.id.btnAdd);
+        recyclerView = findViewById(R.id.notesRecyclerView);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
@@ -84,26 +87,47 @@ public class NotesActivity extends AppCompatActivity {
 
         addNote.setOnClickListener(v -> addNote());
 
+        adapter.setOnNoteLongClickListener((note, position) -> {
+            new AlertDialog.Builder(NotesActivity.this) // Use 'getContext()' if you're in a Fragment
+                    .setTitle("Delete Note")
+                    .setMessage("Are you sure you want to delete this note?")
+                    .setPositiveButton("Delete", (dialog, which) -> {
+                        // Delete the note
+                        dbHelper.deleteNote(note.getId());
+                        noteList.remove(position);
+                        adapter.notifyItemRemoved(position);
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+
+
+        });
+        adapter.setNoteOnClickListener((note, position) -> {
+            Intent intent = new Intent(NotesActivity.this, EditNoteActivity.class);
+            intent.putExtra("note_id", note.getId());
+            intent.putExtra("note_title", note.getTitle());
+            intent.putExtra("note_text", note.getText());
+            noteList.clear();
+            startActivity(intent);
+        });
+        showNotes();
 
     }
 
     private void addNote() {
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.add_note_dialog);
-        dialog.setCancelable(true);
-        dialog.getWindow().setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        dialog.show();
-
-        Button saveButton = dialog.findViewById(R.id.btnSave);
-        Button cancelButton = dialog.findViewById(R.id.btnCancel);
-        saveButton.setOnClickListener(v -> {
-
-        });
-        cancelButton.setOnClickListener(v -> dialog.dismiss());
-
+        Intent intent = new Intent(NotesActivity.this, AddNoteActivity.class);
+        startActivity(intent);
     }
 
     private void showNotes() {
-
+        noteList.clear();
+        noteList.addAll(dbHelper.getAllNotes());
+        adapter.notifyDataSetChanged();
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        showNotes(); // reload notes list
+    }
+
 }

@@ -23,12 +23,43 @@ private DatabaseHelper dbHelper;
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_note, parent, false);
         return new NoteAdapter.NoteViewHolder(view);
     }
+    private NoteAdapter.OnNoteLongClickListener longClickListener;
+    public interface OnNoteLongClickListener {
+        void onNoteLongClick(Note note, int position);
+    }
+
+    public void setOnNoteLongClickListener(NoteAdapter.OnNoteLongClickListener listener) {
+        this.longClickListener = listener;
+    }
+    public interface OnNoteClickListener {
+        void onNoteClick(Note note, int position);
+    }
+
+    private OnNoteClickListener clickListener;
+
+    public void setNoteOnClickListener(OnNoteClickListener listener) {
+        this.clickListener = listener;
+    }
+
 
     @Override
     public void onBindViewHolder(@NonNull NoteAdapter.NoteViewHolder holder, int position) {
         Note note = noteList.get(position);
         holder.noteTitle.setText(note.getTitle());
         holder.noteText.setText(note.getText());
+
+        holder.itemView.setOnLongClickListener(v -> {
+            if (longClickListener != null) {
+                longClickListener.onNoteLongClick(note, position);
+            }
+            return true;
+        });
+        holder.itemView.setOnClickListener(v -> {
+            if (clickListener != null) {
+                clickListener.onNoteClick(note, position);
+            }
+        });
+
     }
 
     @Override

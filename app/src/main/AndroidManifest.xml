@@ -26,6 +26,7 @@
         <activity android:name=".NotesActivity"/>
         <activity android:name=".StudyTimerActivity"/>
         <activity android:name=".SettingsActivity"/>
+        <activity android:name=".AddNoteActivity"/>
 
     </application>
 

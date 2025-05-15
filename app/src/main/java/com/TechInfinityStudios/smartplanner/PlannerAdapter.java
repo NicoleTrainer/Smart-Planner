@@ -25,14 +25,33 @@ public class PlannerAdapter extends RecyclerView.Adapter<PlannerAdapter.PlannerV
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_event, parent, false);
         return new PlannerAdapter.PlannerViewHolder(view);
     }
+    public interface OnItemLongClickListener {
+        void onItemLongClick(PlannerEvent event, int position);
+    }
+
+    private OnItemLongClickListener longClickListener;
+
+    public void setOnItemLongClickListener(OnItemLongClickListener listener) {
+        this.longClickListener = listener;
+    }
 
     @Override
-    public void onBindViewHolder(@NonNull PlannerAdapter.PlannerViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull PlannerViewHolder holder, int position) {
         PlannerEvent event = eventList.get(position);
         holder.EventTitle.setText(event.getTitle());
         holder.EventTime.setText(event.getTime());
 
+        holder.itemView.setOnLongClickListener(v -> {
+            if (longClickListener != null) {
+                longClickListener.onItemLongClick(event, position);
+            }
+            return true;
+        });
     }
+
+
+
+
 
     @Override
     public int getItemCount() {
